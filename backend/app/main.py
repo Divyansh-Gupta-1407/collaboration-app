@@ -1,21 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
-from . import database
+from .database import get_db
 from .models.user import User
 from .schemas.user import UserCreate
-from .utils.security import hash_password, verify_password, create_access_token
+from .utils.security import hash_password, verify_password, create_access_token, get_current_user
 from .schemas.login import LoginRequest
 
 
 app = FastAPI()
 
-# Dependency
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -35,10 +28,18 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.post("/login")
-def login(credentials: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == credentials.username).first()
-    if not user or not verify_password(credentials.password, user.password_hash):
+def login(
+    username: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.username == username).first()
+    if not user or not verify_password(password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
+
+@app.get("/me")
+def read_me(current_user: User = Depends(get_current_user)):
+    return {"id": current_user.id, "username": current_user.username}
