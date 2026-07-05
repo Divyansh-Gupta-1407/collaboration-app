@@ -6,6 +6,8 @@ from .schemas.user import UserCreate
 from .utils.security import hash_password, verify_password, create_access_token, get_current_user
 from .schemas.login import LoginRequest
 from .models.document import Document
+from .models.collaborator import DocumentCollaborator
+
 
 
 app = FastAPI()
@@ -86,3 +88,42 @@ def delete_document(id: int, db: Session = Depends(get_db), current_user = Depen
     db.delete(doc)
     db.commit()
     return {"message": "Document deleted successfully"}
+
+@app.post("/documents/{id}/share")
+def share_document(id: int, user_id: int, role: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    # Ensure document exists
+    doc = db.query(Document).filter(Document.id == id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Only owner can share
+    if doc.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to share this document")
+
+    # Insert collaborator
+    collaborator = DocumentCollaborator(document_id=id, user_id=user_id, role=role)
+    db.add(collaborator)
+    db.commit()
+    return {"message": "Collaborator added successfully"}
+
+@app.get("/documents/{id}")
+def read_document(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    doc = db.query(Document).filter(Document.id == id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Owner?
+    if doc.owner_id == current_user.id:
+        return {"id": doc.id, "title": doc.title, "content": doc.content}
+
+    # Collaborator?
+    collab = db.query(DocumentCollaborator).filter(
+        DocumentCollaborator.document_id == id,
+        DocumentCollaborator.user_id == current_user.id
+    ).first()
+
+    if collab:
+        return {"id": doc.id, "title": doc.title, "content": doc.content, "role": collab.role}
+
+    # Else forbidden
+    raise HTTPException(status_code=403, detail="Not authorized to view this document")
