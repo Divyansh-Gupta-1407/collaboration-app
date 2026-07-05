@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from . import database
 from .models.user import User
 from .schemas.user import UserCreate
-from .utils.security import hash_password
+from .utils.security import hash_password, verify_password, create_access_token
+from .schemas.login import LoginRequest
+
 
 app = FastAPI()
 
@@ -31,3 +33,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         print("❌ Error in /register:", e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.post("/login")
+def login(credentials: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == credentials.username).first()
+    if not user or not verify_password(credentials.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = create_access_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
