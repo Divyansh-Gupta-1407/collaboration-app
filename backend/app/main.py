@@ -5,6 +5,7 @@ from .models.user import User
 from .schemas.user import UserCreate
 from .utils.security import hash_password, verify_password, create_access_token, get_current_user
 from .schemas.login import LoginRequest
+from .models.document import Document
 
 
 app = FastAPI()
@@ -43,3 +44,45 @@ def login(
 @app.get("/me")
 def read_me(current_user: User = Depends(get_current_user)):
     return {"id": current_user.id, "username": current_user.username}
+
+
+@app.post("/documents")
+def create_document(title: str, content: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    new_doc = Document(title=title, content=content, owner_id=current_user.id)
+    db.add(new_doc)
+    db.commit()
+    db.refresh(new_doc)
+    return {"id": new_doc.id, "title": new_doc.title, "content": new_doc.content}
+
+@app.get("/documents/{id}")
+def read_document(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    doc = db.query(Document).filter(Document.id == id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"id": doc.id, "title": doc.title, "content": doc.content, "owner_id": doc.owner_id}
+
+@app.put("/documents/{id}")
+def update_document(id: int, title: str, content: str, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    doc = db.query(Document).filter(Document.id == id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if doc.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to edit this document")
+
+    doc.title = title
+    doc.content = content
+    db.commit()
+    db.refresh(doc)
+    return {"id": doc.id, "title": doc.title, "content": doc.content}
+
+@app.delete("/documents/{id}")
+def delete_document(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    doc = db.query(Document).filter(Document.id == id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if doc.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this document")
+
+    db.delete(doc)
+    db.commit()
+    return {"message": "Document deleted successfully"}
