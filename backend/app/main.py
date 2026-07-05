@@ -1,14 +1,10 @@
 from fastapi import FastAPI
-from . import database
-
+from .database import engine, Base
+from .models import user, document, collaborator
 app = FastAPI()
 
-# Temporary check: try connecting
-try:
-    with database.engine.connect() as conn:
-        print("✅ Connected to PostgreSQL successfully!")
-except Exception as e:
-    print("❌ Database connection failed:", e)
+# Create tables in the database
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
