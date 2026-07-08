@@ -277,4 +277,4 @@ The backend supports authentication, document management, and role-based access 
 ---
 
 ## Author
-**Divyansh Gupta**
+Divyansh Gupta
