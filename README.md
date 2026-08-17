@@ -8,7 +8,6 @@ This is a cloud-native platform built to allow multiple users to collaborate in 
 
 We use Sphinx to maintain detailed, structured documentation for this project. 
 
-- **View Online:** [Read the Full Documentation on GitHub Pages](https://your-username.github.io/your-repo-name) *(Note: Replace this link with your actual GitHub Pages URL once deployed)*
 - **Read Locally:** The raw documentation is available in the [`docs/`](docs/) directory.
 
 ### Quick Start
