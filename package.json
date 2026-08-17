@@ -1,0 +1,24 @@
+{
+  "name": "collab-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Distributed Real-Time Collaboration Platform",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "frontend/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up -d && echo 'Infrastructure started'",
+    "dev:services": "concurrently \"npm run dev -w @collab/user-service\" \"npm run dev -w @collab/document-service\" \"npm run dev -w @collab/collaboration-service\" \"npm run dev -w @collab/notification-service\" \"npm run dev -w @collab/search-service\" \"npm run dev -w @collab/web\"",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

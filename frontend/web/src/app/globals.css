@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  body {
+    @apply bg-surface-950 text-gray-100 font-sans antialiased;
+    background-image: radial-gradient(circle at top left, rgba(124, 58, 237, 0.1) 0%, transparent 40%),
+                      radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.1) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  .glass-panel {
+    @apply bg-surface-900/80 backdrop-blur-lg border border-white/10;
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-teal-400;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.6); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply outline-none min-h-[500px] text-lg leading-relaxed text-gray-200;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #6b7280;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h1 { @apply text-4xl font-bold mt-8 mb-4 text-white; }
+.ProseMirror h2 { @apply text-3xl font-semibold mt-6 mb-3 text-white; }
+.ProseMirror h3 { @apply text-2xl font-medium mt-5 mb-2 text-white; }
+.ProseMirror ul { @apply list-disc list-inside my-4 pl-4; }
+.ProseMirror ol { @apply list-decimal list-inside my-4 pl-4; }
+.ProseMirror blockquote { @apply border-l-4 border-purple-500 pl-4 my-4 italic text-gray-400 py-2 rounded-r; background: rgba(255,255,255,0.05); }
+.ProseMirror pre { @apply text-gray-200 p-4 rounded-md my-4 font-mono text-sm overflow-x-auto border border-white/10; background: #0a0e1a; }
+.ProseMirror code { @apply px-1.5 py-0.5 rounded text-teal-300 font-mono text-sm; background: rgba(255,255,255,0.1); }
+
+/* Collaboration Cursors */
+.collaboration-cursor__caret {
+  border-left: 2px solid #000;
+  border-right: 2px solid #000;
+  margin-left: -2px;
+  margin-right: -2px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+.collaboration-cursor__label {
+  border-radius: 3px 3px 3px 0;
+  color: #000;
+  font-size: 12px;
+  font-weight: 600;
+  left: -2px;
+  line-height: normal;
+  padding: 0.1rem 0.3rem;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+}
