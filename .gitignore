@@ -36,3 +36,6 @@ docs/_build/
 docs/.venv/
 
 *.tsbuildinfo
+
+# gitignore file
+.gitignore

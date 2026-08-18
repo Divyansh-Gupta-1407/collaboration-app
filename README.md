@@ -1,6 +1,27 @@
 # Distributed Real-Time Collaboration Platform
 
+<<<<<<< HEAD
 A cloud-native, distributed real-time collaboration platform designed for teams to edit documents, share workspaces, and track presence concurrently. Built from the ground up with a focus on modern software engineering practices, Event-Driven microservices, and high scalability.
+=======
+Welcome to the Distributed Real-Time Collaboration Platform! 
+
+This is a cloud-native platform built to allow multiple users to collaborate in real-time on documents, whiteboards, and tasks using CRDTs (Conflict-free Replicated Data Types) and a microservices architecture.
+
+## 📖 Documentation
+
+We use Sphinx to maintain detailed, structured documentation for this project. 
+
+- **Read Locally:** The raw documentation is available in the [`docs/`](docs/) directory.
+
+### Quick Start
+To run the platform locally using Docker and npm workspaces:
+```bash
+npm install
+docker compose up -d
+npm run dev:services
+```
+*For detailed architecture, configuration, and API specifications, please refer to the Sphinx documentation linked above.*
+>>>>>>> 1f2eb5e17ea7644b2727905c6b97b4152ca9cd81
 
 ---
 
