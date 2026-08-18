@@ -1,6 +1,6 @@
 # Distributed Real-Time Collaboration Platform
 
-<<<<<<< HEAD
+<HEAD
 A cloud-native, distributed real-time collaboration platform designed for teams to edit documents, share workspaces, and track presence concurrently. Built from the ground up with a focus on modern software engineering practices, Event-Driven microservices, and high scalability.
 =======
 Welcome to the Distributed Real-Time Collaboration Platform! 
