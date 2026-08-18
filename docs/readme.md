@@ -1,83 +1,132 @@
 # Distributed Real-Time Collaboration Platform
 
-A cloud-native platform where multiple users can collaborate in real-time on documents, whiteboards, tasks, and code snippets. Built with a focus on modern software engineering practices, distributed systems architecture, and scalability.
-
-## 🌟 Key Features
-
-- **Real-Time Collaborative Editing:** Powered by Yjs CRDTs (Conflict-free Replicated Data Types) and WebSockets, ensuring seamless and conflict-free concurrent document editing.
-- **User Presence & Live Cursors:** See exactly who is online and where they are editing in real-time.
-- **Microservices Architecture:** Independently scalable backend services communicating via REST, WebSockets, and asynchronous Kafka events.
-- **Role-Based Workspaces:** Organize documents into workspaces with Owner, Admin, Editor, and Viewer permissions.
-- **Fast, Full-Text Search:** Continuous indexing into Elasticsearch for immediate searchability of documents.
-- **Premium UI:** A beautifully crafted, dark-mode Next.js frontend featuring glassmorphism and smooth micro-animations.
+A cloud-native, distributed real-time collaboration platform designed for teams to edit documents, share workspaces, and track presence concurrently. Built from the ground up with a focus on modern software engineering practices, Event-Driven microservices, and high scalability.
 
 ---
 
-## 🏗️ System Architecture
+## 🚀 Features
 
-The platform is built as a monorepo utilizing npm workspaces and Docker Compose for orchestration.
+- **Real-Time Collaborative Editing:** Powered by **Yjs** (CRDTs - Conflict-free Replicated Data Types) and WebSockets, ensuring seamless, conflict-free document editing across multiple clients regardless of network latency.
+- **User Presence & Live Cursors:** See exactly who is online and where they are editing in real-time.
+- **Role-Based Access Control (RBAC):** Granular permissions for Workspaces (Owner, Admin, Editor, Viewer).
+- **Event-Driven Notifications:** Asynchronous, non-blocking notification generation utilizing **Kafka** message queues.
+- **Fast, Full-Text Search:** Continuous indexing into **Elasticsearch** for immediate, low-latency document searching.
+- **Premium User Interface:** A dark-mode, glassmorphic UI built with **Next.js 14**, **TailwindCSS**, and **TipTap**.
+- **Monorepo Architecture:** Clean codebase utilizing `npm workspaces` for shared types and interfaces across all microservices and the frontend.
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
 - **Framework:** Next.js 14 (App Router)
-- **Styling:** TailwindCSS
+- **Styling:** TailwindCSS (Custom Glassmorphism Design System)
 - **State Management:** Zustand
-- **Editor:** TipTap (Headless rich text editor)
+- **Rich Text Editor:** TipTap (Headless, highly extensible editor)
 - **Real-Time Client:** `y-websocket` & `yjs`
 
-### Backend Services
-1. **User Service (Port 4001):** Handles JWT authentication and user profile management.
-2. **Document Service (Port 4002):** Manages workspaces, document CRUD operations, and permission structures.
-3. **Collaboration Service (Port 4003):** WebSocket server managing Yjs CRDTs, live cursors, and user presence (uses Redis pub/sub for horizontal scaling).
-4. **Notification Service (Port 4004):** Event-driven service consuming Kafka events to generate user notifications.
-5. **Search Service (Port 4005):** Consumes Kafka events to continuously index document changes into Elasticsearch.
+### Backend Services (Node.js & TypeScript)
+- **API Framework:** Express.js
+- **Authentication:** JSON Web Tokens (JWT), bcrypt
+- **Real-Time Server:** `y-websocket` (custom server implementation with awareness and CRDT state syncing)
+- **Inter-Service Communication:** Apache Kafka (KafkaJS)
 
-### Infrastructure (Docker)
-- **PostgreSQL 16:** Primary relational data store.
-- **Redis 7:** Caching and WebSocket pub/sub.
-- **Kafka & Zookeeper:** High-throughput message broker for inter-service communication.
-- **Elasticsearch:** Fast text search engine.
-- **MinIO:** S3-compatible object storage for future file attachments.
-- **NGINX:** API Gateway routing requests to respective microservices.
+### Infrastructure & Data Stores
+- **Primary Database:** PostgreSQL 16 (Relational data, user profiles, document metadata)
+- **Caching & Pub/Sub:** Redis 7 (Scaling WebSocket presence across multiple instances)
+- **Message Broker:** Apache Kafka & Zookeeper (Event streaming)
+- **Search Engine:** Elasticsearch (Full-text search indexing)
+- **Object Storage:** MinIO (S3-compatible storage for file attachments)
+- **API Gateway:** NGINX (Reverse proxying and routing requests to appropriate microservices)
+- **Orchestration:** Docker & Docker Compose
 
 ---
 
-## 🚀 Getting Started
+## 📐 System Architecture
+
+The platform follows an Event-Driven Microservices architecture. 
+
+1. **User Service (`port 4001`):** Handles authentication, registration, and user profile management.
+2. **Document Service (`port 4002`):** Manages the core business logic for workspaces and documents. When a document is created or modified, it publishes `document-events` to Kafka.
+3. **Collaboration Service (`port 4003`):** The real-time engine. Upgrades HTTP connections to WebSockets. Manages binary Yjs CRDT updates and broadcasts presence/cursors. Uses Redis Pub/Sub to sync state if scaled horizontally.
+4. **Notification Service (`port 4004`):** A background service that consumes Kafka events (e.g., `user_joined`, `document_shared`) and generates notifications.
+5. **Search Service (`port 4005`):** Consumes Kafka `document-events` to continuously update the Elasticsearch index, keeping search results highly accurate and fast.
+6. **API Gateway (NGINX on `port 8080`):** Acts as the single entry point for the frontend, routing `/api/users` to the User Service, `/api/docs` to the Document Service, etc., while natively supporting WebSocket upgrades for `/api/collab`.
+
+---
+
+## 📂 File Structure
+
+```text
+collaboration_systems/
+├── frontend/
+│   └── web/                        # Next.js 14 Frontend Application
+│       ├── src/
+│       │   ├── app/                # Next.js App Router (Pages & Layouts)
+│       │   ├── components/         # Reusable UI Components (Editor, Sidebar, Avatar)
+│       │   └── store/              # Zustand state stores
+├── services/                       # Backend Microservices
+│   ├── user-service/               # Authentication & User Profiles
+│   ├── document-service/           # Workspace & Document CRUD
+│   ├── collaboration-service/      # WebSocket server for Yjs CRDTs
+│   ├── notification-service/       # Kafka consumer for notifications
+│   └── search-service/             # Elasticsearch indexing via Kafka
+├── packages/
+│   └── shared/                     # Shared TypeScript interfaces & DTOs
+├── infra/                          # Infrastructure Configurations
+│   ├── nginx/                      # NGINX API Gateway config
+│   └── postgres/                   # SQL Initialization Scripts
+├── docs/                           # Sphinx Documentation source
+├── docker-compose.yml              # Local infrastructure orchestration
+└── package.json                    # Root monorepo configuration
+```
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v20+ recommended)
 - [Docker](https://www.docker.com/) & Docker Compose
+- [Git](https://git-scm.com/)
 
 ### Installation & Setup
 
-1. **Clone the repository and install dependencies:**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/collaboration-app.git
+   cd collaboration-app
+   ```
+
+2. **Install all dependencies:**
+   *(This utilizes npm workspaces to install dependencies for all sub-projects concurrently).*
    ```bash
    npm install
    ```
 
-2. **Start the Infrastructure:**
-   This will spin up Postgres, Redis, Kafka, Elasticsearch, MinIO, and NGINX.
+3. **Start the Infrastructure (Docker):**
+   This spins up Postgres, Redis, Kafka, Elasticsearch, MinIO, and NGINX in the background.
    ```bash
    docker compose up -d
    ```
 
-3. **Start the Development Servers:**
-   This command uses `concurrently` to boot up all 5 backend microservices and the Next.js frontend simultaneously.
+4. **Start the Development Servers:**
+   This command boots up all 5 backend microservices and the Next.js frontend simultaneously using `concurrently`.
    ```bash
    npm run dev:services
    ```
 
-4. **Access the Platform:**
-   - **Frontend UI:** Open your browser to [http://localhost:3000](http://localhost:3000)
-   - **API Gateway:** Accessible at `http://localhost:8080`
+5. **Access the Platform:**
+   - **Frontend UI:** Open [http://localhost:3000](http://localhost:3000)
+   - **API Gateway:** `http://localhost:8080`
 
 ---
 
-## 🧪 Testing Collaboration Locally
-To see the real-time features in action:
+## 🧪 Testing Real-Time Collaboration
+
+To see the CRDT synchronization and live presence features in action locally:
 1. Open `http://localhost:3000` in your main browser window and register a new user.
-2. Open `http://localhost:3000` in an Incognito/Private window and register a second user.
-3. Create a workspace and document with User 1.
-4. Open the same document with User 2 and start typing—you will see live cursors and instant syncing across both windows!
-
----
-*Created by Divyansh Gupta*
+2. Open `http://localhost:3000` in a completely separate Incognito/Private window (or a different browser) and register a second user.
+3. Create a workspace and a new document using User 1.
+4. Navigate to that same document with User 2.
+5. Start typing! You will see live cursors, names, and instant text synchronization across both windows with near-zero latency.
