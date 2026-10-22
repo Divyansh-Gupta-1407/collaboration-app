@@ -20,8 +20,6 @@ npm install
 docker compose up -d
 npm run dev:services
 ```
-*For detailed architecture, configuration, and API specifications, please refer to the Sphinx documentation linked above.*
->>>>>>> 1f2eb5e17ea7644b2727905c6b97b4152ca9cd81
 
 ---
 
