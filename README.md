@@ -9,7 +9,7 @@ This is a cloud-native platform built to allow multiple users to collaborate in 
 
 ## 📖 Documentation
 
-We use Sphinx to maintain detailed, structured documentation for this project. 
+I use Sphinx to maintain detailed, structured documentation for this project. 
 
 - **Read Locally:** The raw documentation is available in the [`docs/`](docs/) directory.
 
@@ -152,5 +152,3 @@ To see the CRDT synchronization and live presence features in action locally:
 4. Navigate to that same document with User 2.
 5. Start typing! You will see live cursors, names, and instant text synchronization across both windows with near-zero latency.
 
----
-*Documentation built with Sphinx. For full developer documentation, visit the [GitHub Pages](https://your-username.github.io/collaboration-app) site.*
